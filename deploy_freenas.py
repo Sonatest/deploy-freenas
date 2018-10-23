@@ -138,6 +138,27 @@ for index in range(100):
     cert_id = cert_data['id']
     break
 
+# set cert in S3 service
+r = requests.put(
+  PROTOCOL + FREENAS_ADDRESS + ':' + PORT + '/api/v1.0/services/s3/',
+  verify=VERIFY,
+  auth=(USER, PASSWORD),
+  headers={'Content-Type': 'application/json'},
+  data=json.dumps({
+  "s3_certificate": cert_id,
+  }),
+)
+
+if r.status_code == 200:
+  print ("Setting S3 certificate successful")
+else:
+  print ("Error setting S3 certificate!")
+  print (r)
+  sys.exit(1)
+
+# restart s3
+freenas.restart_service('s3')
+
 # Set our cert as active
 r = requests.put(
   PROTOCOL + FREENAS_ADDRESS + ':' + PORT + '/api/v1.0/system/settings/',
