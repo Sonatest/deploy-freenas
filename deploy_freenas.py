@@ -53,6 +53,41 @@ PORT = deploy.get('port','80')
 now = datetime.now()
 cert = "letsencrypt-%s-%s-%s-%s" %(now.year, now.strftime('%m'), now.strftime('%d'), ''.join(c for c in now.strftime('%X') if c.isdigit()))
 
+class Freenas(object):
+    def __init__(self):
+        self._hostname = DOMAIN_NAME
+        self._user = USER
+        self._secret = PASSWORD
+        self._ep = 'https://%s/api/v1.0' % self._hostname
+    def request(self, resource, method='GET', data=None):
+        if data is None:
+            data = ''
+        r = requests.request(
+            method,
+            '%s/%s/' % (self._ep, resource),
+            data=json.dumps(data),
+            headers={'Content-Type': "application/json"},
+            auth=(self._user, self._secret),)
+        if r.ok:
+            try:
+                return r.json()
+            except:
+                return r.text
+        print(r.text)
+        raise ValueError(r)
+
+    def set_service_enabled(self, name, enabled=True):
+        self.request('services/services/%s' % name,
+            method='PUT',
+            data={'srv_enable': enabled,}
+        )
+
+    def restart_service(self, service_name):
+        self.set_service_enabled(service_name, False)
+        self.set_service_enabled(service_name, True)
+
+freenas = Freenas()
+
 # Load cert/key
 with open(PRIVATEKEY_PATH, 'r') as file:
   priv_key = file.read()
