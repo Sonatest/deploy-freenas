@@ -51,8 +51,7 @@ FULLCHAIN_PATH = deploy.get('fullchain_path',"/root/.acme.sh/" + DOMAIN_NAME + "
 PROTOCOL = deploy.get('protocol','http://')
 PORT = deploy.get('port','80')
 now = datetime.now()
-cert = "letsencrypt-%s-%s-%s-%s" %(now.year, now.strftime('%m'), now.strftime('%d'), ''.join(c for c in now.strftime('%X') if
-c.isdigit()))
+cert = "letsencrypt-%s-%s-%s-%s" %(now.year, now.strftime('%m'), now.strftime('%d'), ''.join(c for c in now.strftime('%X') if c.isdigit()))
 
 # Load cert/key
 with open(PRIVATEKEY_PATH, 'r') as file:
